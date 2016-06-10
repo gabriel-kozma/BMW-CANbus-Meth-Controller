@@ -109,9 +109,9 @@ void setup()
     if(CAN.begin(MCP_CAN_SPEED_500KBPS) != CAN_OK) canInit = CAN_FAILINIT;
 
     /* Configure filters and masks. */
-    /* Set both masks for the full 11 bit ID. */
+    /* Set only the first buffer's mask - prevent filter hits on the second buffer. */
     if(CAN.init_Mask(0, 0, UDS_CAN_ID_MASK) != CAN_OK) canInit = CAN_FAILINIT;
-    if(CAN.init_Mask(1, 0, UDS_CAN_ID_MASK) != CAN_OK) canInit = CAN_FAILINIT;
+    if(CAN.init_Mask(1, 0, 0) != CAN_OK) canInit = CAN_FAILINIT;
 
     /* The first two filters apply to the higher priority RX buffer (buffer 0). */
     /* If that buffer is occupied, it will overflow into the second buffer */
