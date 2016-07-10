@@ -48,27 +48,17 @@
 /* Provide chip select on pin 10. */
 MCP_CAN CAN(CONTROLLER_MAIN_CAN_CHIP_SEL_PIN);
 
-/* Interrupt flag. Single byte; atomic. */
-static volatile unsigned char _intrFlagRecv = 0;
-
 /********************************************************************/
 /*                   STATIC FUNCTION PROTOTYPES                     */
 /********************************************************************/
 
 /* These prototypes are necessary to avoid compiler warnings for some reason, */
 /* even though they're defined before they're called... */
-static void _mcp2515ISR();
 static void _canRXMsgDispatch(uint32_t id, uint8_t * buf);
 
 /********************************************************************/
 /*                   STATIC FUNCTION DEFINITIONS                    */
 /********************************************************************/
-
-/* Interrupt service routine for the CAN controller's RX interrupt. */
-static void _mcp2515ISR()
-{
-    _intrFlagRecv = 1;
-}
 
 /* This function dispatches received CAN messages to the proper service. */
 static void _canRXMsgDispatch(uint32_t id, uint8_t * buf)
@@ -97,9 +87,6 @@ void setup()
 
     /* Call the early initialization routine for all controllers. */
     MethServiceInitEarly();
-
-    /* Register ISR for CAN message RX event. */
-    attachInterrupt(0, _mcp2515ISR, FALLING);
 
     /* 2011 BMW E92 uses a 500Kbps CANbus on the OBD port. */
     if(CAN.begin(MCP_CAN_SPEED_500KBPS) != CAN_OK) canInit = CAN_FAILINIT;
@@ -149,16 +136,11 @@ void loop()
     static uint8_t rxLen = 0;
     static uint8_t rxBuf[MCP_CAN_MAX_MSG_LEN] = {0};
 
-    if(_intrFlagRecv)
+    /* Grab a CAN message if one is waiting. */
+    if(CAN_MSGAVAIL == CAN.checkReceive())
     {
-        _intrFlagRecv = 0;
-
-        /* Loop until there are no messages. This ensures that the interrupt will be reset. */
-        while(CAN_MSGAVAIL == CAN.checkReceive())
-        {
-            CAN.readMsgBuf(&rxLen, rxBuf);
-            _canRXMsgDispatch(CAN.getCanId(), rxBuf);
-        }
+        CAN.readMsgBuf(&rxLen, rxBuf);
+        _canRXMsgDispatch(CAN.getCanId(), rxBuf);
     }
 
     /* Execute each service. */
