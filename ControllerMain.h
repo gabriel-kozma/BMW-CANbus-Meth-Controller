@@ -40,14 +40,5 @@
 /* Can controller SPI chip select pin. */
 #define CONTROLLER_MAIN_CAN_CHIP_SEL_PIN           10
 
-/* Good status output pin. Can be hooked to an LED. */
-/* A better term may have been "armed and ready"... */
-/* This basically ends up being the same as the meth controller's */
-/* failsafe output pin, but inverted. The reason being that */
-/* it's nice to know that the system is powered on and running. */
-/* If the failsafe isn't tripped, we don't know if everything is okay */
-/* or if the unit is just dead. */
-#define CONTROLLER_MAIN_OKAY_OUTPUT_PIN            6
-
 
 #endif /* _CONTROLLERMAIN_H_ */

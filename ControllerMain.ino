@@ -95,10 +95,6 @@ void setup()
     /* Initialize UART. Other services might rely on it. */
     Serial.begin(115200);
 
-    /* Initialize system okay output pin to OFF. */
-    pinMode(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, OUTPUT);
-    digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
-
     /* Call the early initialization routine for all controllers. */
     MethServiceInitEarly();
 
@@ -174,43 +170,36 @@ void loop()
     switch(MethServiceGetState())
     {
     case METH_SERVICE_STATE_FAILURE:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
 #if defined(CONTROLLER_MAIN_SERIAL_DEBUG)
         Serial.println("STATE: FAILURE");
 #endif
         break;
 
     case METH_SERVICE_STATE_READY_ARMED:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, HIGH);
         break;
 
     case METH_SERVICE_STATE_INJECTING:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, HIGH);
         break;
 
     case METH_SERVICE_STATE_DISABLED:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
 #if defined(CONTROLLER_MAIN_SERIAL_DEBUG)
         Serial.println("STATE: DISABLED");
 #endif
         break;
 
     case METH_SERVICE_STATE_DISABLED_WARN:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
 #if defined(CONTROLLER_MAIN_SERIAL_DEBUG)
         Serial.println("STATE: DISABLED-WARN");
 #endif
         break;
 
     case METH_SERVICE_STATE_LOW_TANK:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
 #if defined(CONTROLLER_MAIN_SERIAL_DEBUG)
         Serial.println("STATE: LOW-TANK");
 #endif
         break;
 
     default:
-        digitalWrite(CONTROLLER_MAIN_OKAY_OUTPUT_PIN, LOW);
 #if defined(CONTROLLER_MAIN_SERIAL_DEBUG)
         Serial.println("STATE: ERROR - UNKNOWN STATE");
 #endif
