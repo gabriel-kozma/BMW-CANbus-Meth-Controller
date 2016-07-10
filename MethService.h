@@ -127,7 +127,8 @@
 #define METH_SERVICE_MINIMUM_IDC                   100.0
 
 /* When the desired flow rate is >= this value, the solenoid is opened. */
-#define METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH    180.0
+/* A value of 140 should result in the solenoid opening at around 265-270 whp. */
+#define METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH    140.0
 
 /* In non-progressive mode, force the table lookup routine to use the last value. */
 /* If the target value falls between the last and second to last values, it ends up */
