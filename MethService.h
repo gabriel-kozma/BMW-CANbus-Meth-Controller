@@ -96,7 +96,7 @@
 /* 15% of the injected fuel mass be methanol, we only need to inject about 14% of the cc/min. */
 /* Normally, this won't matter. We can just think in terms of volume flow rather than mass flow. */
 #define METH_SERVICE_DESIRED_METH_FLOW_FUEL_DELIVERY_PERCENTAGE \
-(const double[]){0.0,    0.0,    0.0,    0.0,    2.0,     4.0,     6.0,     8.0,    10.0,    12.0,    14.0,    14.0}
+(const double[]){0.0,    0.0,    0.0,    0.0,    0.0,    10.0,    10.0,    10.0,    10.0,    10.0,    10.0,    10.0}
 /* EST HORSEPOWER  0      43      85     128     170      208      234      265      302      321      352      387 */
 /* Horsepower estimates are based off of .5 BSFC in low end to .55 BSFC in high end. */
 
@@ -127,8 +127,7 @@
 #define METH_SERVICE_MINIMUM_IDC                   100.0
 
 /* When the desired flow rate is >= this value, the solenoid is opened. */
-/* A value of 140 should result in the solenoid opening at around 265-270 whp. */
-#define METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH    140.0
+#define METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH    120.0
 
 /* In non-progressive mode, force the table lookup routine to use the last value. */
 /* If the target value falls between the last and second to last values, it ends up */
