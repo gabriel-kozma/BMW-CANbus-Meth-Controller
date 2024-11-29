@@ -174,8 +174,8 @@ MCP_CAN_Ret_Val_E MCP_CAN::mcp2515_init(const MCP_CAN_Speed_E canSpeed)
     mcp2515_setRegister(MCP_RXB0CTRL, 0);
     mcp2515_setRegister(MCP_RXB1CTRL, 0);
 
-    /* Initialize interrupts (both RX buffers). */
-    mcp2515_setRegister(MCP_CANINTE, MCP_RX0IF | MCP_RX1IF);
+    /* No interrupts. Pool in main loop instead. */
+    mcp2515_setRegister(MCP_CANINTE, 0);
 
     /* Enable both receive buffers to receive messages with std/ext identifiers */
     /* and enable rollover. */

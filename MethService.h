@@ -50,11 +50,17 @@
 /* the solenoid. */
 #define METH_SERVICE_PWM_OUTPUT_PIN                9
 
-/* The pump control output pin. This drives relay 1 on the relay board. */
-#define METH_SERVICE_PUMP_OUTPUT_PIN               4
+/* The pump control output pin. This drives 5V directly to the speed */
+/* control input of the Diener pump's BLDC controller. */
+#define METH_SERVICE_PUMP_OUTPUT_PIN               6
 
-/* The failsafe pin. This drives relay 2 on the relay board. */
-#define METH_SERVICE_FAILSAFE_OUTPUT_PIN           7
+/* The failsafe pin. This drives relay 3 on the relay board. */
+/* This is actually used as the 24V power enable now, but it still can be */
+/* considered a failsafe. */
+/* The relay is N-O and it's held closed when in a "good" state. */
+/* Therefore, a failure will open the relay and cut power to the pump and */
+/* solenoid. */
+#define METH_SERVICE_FAILSAFE_OUTPUT_PIN           8
 
 /* The tank sensor input. This pin is pulled high internally and grounded */
 /* to indicate closure of the tank level sensor. */
@@ -90,9 +96,21 @@
 /* 15% of the injected fuel mass be methanol, we only need to inject about 14% of the cc/min. */
 /* Normally, this won't matter. We can just think in terms of volume flow rather than mass flow. */
 #define METH_SERVICE_DESIRED_METH_FLOW_FUEL_DELIVERY_PERCENTAGE \
-(const double[]){0.0,    0.0,    0.0,    0.0,    2.0,     4.0,     6.0,     8.0,    10.0,    12.0,    14.0,    14.0}
+(const double[]){0.0,    0.0,    0.0,    0.0,   10.0,    10.0,    10.0,    10.0,    10.0,    10.0,    10.0,    10.0}
 /* EST HORSEPOWER  0      43      85     128     170      208      234      265      302      321      352      387 */
 /* Horsepower estimates are based off of .5 BSFC in low end to .55 BSFC in high end. */
+
+/* Flag to indicate whether the system will use a progressive spraying scheme or not. */
+/* For now, use non-progressive until I can verify the performance of the solenoid. */
+//#define METH_SERVICE_PROGRESSIVE_SPRAY
+
+/* Support progressive and non-progressive spray schemes. */
+#if defined(METH_SERVICE_PROGRESSIVE_SPRAY)
+
+/* Minimum allowed injector duty cycle. This is used to disable the */
+/* non-linear region and prevent fluid from not being atomized during low */
+/* demand situations. */
+#define METH_SERVICE_MINIMUM_IDC                   0.0
 
 /* This is the mapping of desired meth volume flow rate to output PWM duty. */
 /* Ideally, this is linear. We can measure it later... */
@@ -102,6 +120,25 @@
 /* Duty cycle percentage (0-100). */
 #define METH_SERVICE_DESIRED_METH_FLOW_PWM_ARRAY \
 (const double[]){0.0,    9.0,   18.0,   27.0,   36.0,    45.0,    54.0,    63.0,    72.0,    81.0,    90.0,   100.0}
+
+#else
+
+/* In non-progressive mode, this is used to limit the static flow rate of the nozzle. */
+#define METH_SERVICE_MINIMUM_IDC                   100.0
+
+/* When the desired flow rate is >= this value, the solenoid is opened. */
+#define METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH    115.0
+
+/* In non-progressive mode, force the table lookup routine to use the last value. */
+/* If the target value falls between the last and second to last values, it ends up */
+/* being clamped down to 0 by the MINIMUM_IDC check. */
+#define METH_SERVICE_DESIRED_METH_FLOW_CC_MIN_ARRAY \
+(const double[]){0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, METH_SERVICE_NON_PROGRESSIVE_REQ_THRESH}
+/* Duty cycle percentage (0-100). */
+#define METH_SERVICE_DESIRED_METH_FLOW_PWM_ARRAY \
+(const double[]){0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, METH_SERVICE_MINIMUM_IDC}
+
+#endif
 
 /* We should add another table to compensate for manifold pressure being subtracted from */
 /* the effective pump pressure, but we won't. Instead, just assume 15 psi everywhere. */

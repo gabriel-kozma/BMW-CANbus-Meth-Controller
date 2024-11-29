@@ -171,16 +171,16 @@ static void _stopInjecting(void)
     digitalWrite(METH_SERVICE_PUMP_OUTPUT_PIN, LOW);
 }
 
-/* This function activates the failsafe relay. */
+/* This function de-activates the failsafe relay. */
 static void _tripFailSafe(void)
 {
-    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, HIGH);
+    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, LOW);
 }
 
-/* This function de-activates the failsafe relay. */
+/* This function activates the failsafe relay. */
 static void _untripFailSafe(void)
 {
-    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, LOW);
+    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, HIGH);
 }
 
 /* This function converts the raw kilograms per hour value from the ECU */
@@ -387,6 +387,12 @@ static MethServiceState_E _fsmRXMsg(void * arg)
                                               desiredMethFlowCC);
     }
 
+    /* Clamp duty cycles lower than minimum to 0%. */
+    if (desiredMethPWM < METH_SERVICE_MINIMUM_IDC) 
+    {
+        desiredMethPWM = 0.0;
+    }
+
     /* Set outputs. */
     _injectPWMEnable(desiredMethPWM);
 
@@ -431,7 +437,7 @@ void MethServiceInitEarly(void)
     pinMode(METH_SERVICE_PUMP_OUTPUT_PIN, OUTPUT);
     digitalWrite(METH_SERVICE_PUMP_OUTPUT_PIN, LOW);
     pinMode(METH_SERVICE_FAILSAFE_OUTPUT_PIN, OUTPUT);
-    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, HIGH);     /* Failsafe init ON. */
+    digitalWrite(METH_SERVICE_FAILSAFE_OUTPUT_PIN, LOW);      /* Failsafe init ON. */
     pinMode(METH_SERVICE_TANK_LEVEL_INPUT_PIN, INPUT_PULLUP);
     pinMode(METH_SERVICE_DISABLE_INPUT_PIN, INPUT_PULLUP);
 
